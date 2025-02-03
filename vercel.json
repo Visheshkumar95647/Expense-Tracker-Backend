@@ -16,10 +16,6 @@
         "dest": "/Routes/userroutes.js"  
       },
       {
-        "src": "/expenses(.*)",
-        "dest": "/Routes/expenseroutes.js" 
-      },
-      {
         "src": "/addexpense",
         "dest": "/Routes/expenseroutes.js"  
       },
