@@ -1,44 +1,51 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "index.js",
-        "use": "@vercel/node"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/login",
-        "dest": "/Routes/userroutes.js"  
-      },
-      {
-        "src": "/register",
-        "dest": "/Routes/userroutes.js"  
-      },
-      {
-        "src": "/addexpense",
-        "dest": "/Routes/expenseroutes.js"  
-      },
-      {
-        "src": "/allExpense",
-        "dest": "/Routes/expenseroutes.js"  
-      },
-      {
-        "src": "/deleteExpense/:id",
-        "dest": "/Routes/expenseroutes.js"  
-      },
-      {
-        "src": "/updateExpense/:id",
-        "dest": "/Routes/expenseroutes.js"  
-      },
-      {
-        "src": "/getByDate",
-        "dest": "/Routes/expenseroutes.js"  
-      },
-      {
-        "src": "/getByYear",
-        "dest": "/Routes/expenseroutes.js"  
-      }
-    ]
-  }
-  
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "env": {
+    "DATABASE": "mongodb+srv://visheshkumar:789456123@cluster0.l8qvm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    "KEY": "EXPENSES@123"
+  },
+  "routes": [
+    {
+      "src": "/login",
+      "dest": "/routes/userroutes.js"
+    },
+    {
+      "src": "/register",
+      "dest": "/routes/userroutes.js"
+    },
+    {
+      "src": "/expenses(.*)",
+      "dest": "/routes/expenseroutes.js"
+    },
+    {
+      "src": "/addexpense",
+      "dest": "/routes/expenseroutes.js"
+    },
+    {
+      "src": "/allExpense",
+      "dest": "/routes/expenseroutes.js"
+    },
+    {
+      "src": "/deleteExpense/:id",
+      "dest": "/routes/expenseroutes.js"
+    },
+    {
+      "src": "/updateExpense/:id",
+      "dest": "/routes/expenseroutes.js"
+    },
+    {
+      "src": "/getByDate",
+      "dest": "/routes/expenseroutes.js"
+    },
+    {
+      "src": "/getByYear",
+      "dest": "/routes/expenseroutes.js"
+    }
+  ]
+}
