@@ -14,8 +14,12 @@ const Expenses = new mongoose.Schema({
     },
     des : {
         type : String
+    },
+    userId: {  
+        type: mongoose.Schema.Types.ObjectId,
+        required: true 
     }
 })
 
-const expenses = mongoose.model('expense' , Expenses);
+const expenses = mongoose.model('expense-track' , Expenses);
 module.exports = expenses;

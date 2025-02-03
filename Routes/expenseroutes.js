@@ -5,16 +5,23 @@ const VerifyToken = require('../middleware/middleware');
 
 
 // Route to add a new expense
-router.post('/addexpense',VerifyToken, async (req, res) => {
-  console.log("Adding expenses");
+router.post('/addexpense', VerifyToken, async (req, res) => {
+  // console.log("Adding expenses");
+  
   const { des, amount, category, date } = req.body;
+  
+  // console.log(req.user);  
   try {
+    const userId = req.user.id; 
+
     const expense = await expenseSchema.create({
-      amount: amount,
-      category: category,
-      des: des,
-      date: date,
+      amount,
+      category,
+      des,
+      date,
+      userId 
     });
+
     res.status(200).json(expense);
   } catch (error) {
     console.error("Error caught:", error);
@@ -31,7 +38,7 @@ router.post('/addexpense',VerifyToken, async (req, res) => {
 
 
 
-router.get("/allExpense",VerifyToken, async (req, res) => {
+router.get("/allExpense", VerifyToken, async (req, res) => {
   try {
     const { page, limit, category } = req.query;
 
@@ -42,10 +49,16 @@ router.get("/allExpense",VerifyToken, async (req, res) => {
     // Convert category query to an array
     const categoryArray = category ? category.split(",").map(ct => ct.trim()) : [];
 
-    // Apply filter before any transformations
-    const filter = categoryArray.length > 0 
-      ? { category: { $in: categoryArray.map(ct => new RegExp(`^${ct}$`, "i")) } } 
-      : {};
+    // Extract userId from token (from the middleware)
+    const userId = req.user.id; // Assuming VerifyToken middleware attaches user info
+
+    // Apply filters: userId and category
+    const filter = {
+      userId: userId,  // ✅ Filter by userId
+      ...categoryArray.length > 0 
+        ? { category: { $in: categoryArray.map(ct => new RegExp(`^${ct}$`, "i")) } } 
+        : {} 
+    };
 
     // Fetch expenses with pagination
     const expenses = await expenseSchema.find(filter)
@@ -61,6 +74,7 @@ router.get("/allExpense",VerifyToken, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
 
 
 
@@ -108,24 +122,26 @@ router.patch('/updateExpense/:id',VerifyToken, async (req, res) => {
 
 
 router.get('/getByDate', VerifyToken, async (req, res) => {
-
   const { startDate, endDate } = req.query;
+  const userId = req.user.id; // Get userId from the token
+
   try {
-    
+    // Convert the start and end dates to Date objects
     const start = new Date(startDate);
     const end = new Date(endDate);
+
+    // Check if the dates are valid
     if (isNaN(start) || isNaN(end)) {
       return res.status(400).json({ error: "Invalid date format" });
     }
 
+    // Find expenses by userId and date range
     const expenses = await expenseSchema.find(
       {
+        userId: userId,  // Add the userId filter
         date: { $gte: start, $lte: end }
       },
-      {  _id: 0,
-        category: 1,
-        amount: 1
-      }
+      { _id: 0, category: 1, amount: 1 } // Only return category and amount
     );
 
     res.json(expenses);
@@ -135,8 +151,10 @@ router.get('/getByDate', VerifyToken, async (req, res) => {
   }
 });
 
-router.get('/getByYear', VerifyToken,async (req, res) => {
+
+router.get('/getByYear', VerifyToken, async (req, res) => {
   const { startDate, endDate } = req.query;
+  const userId = req.user.id; // Get userId from the token
 
   const start = new Date(`${startDate}-01-01`);
   const end = new Date(`${endDate}-12-31`);
@@ -147,8 +165,12 @@ router.get('/getByYear', VerifyToken,async (req, res) => {
   }
 
   try {
+    // Find expenses for the specific user within the date range
     const data = await expenseSchema.find(
-      { date: { $gte: start, $lte: end } },
+      {
+        userId: userId, // Filter by userId to get the expenses of the logged-in user
+        date: { $gte: start, $lte: end },
+      },
       { date: 1, _id: 0, amount: 1 }
     );
 
@@ -168,6 +190,7 @@ router.get('/getByYear', VerifyToken,async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 
 module.exports = router;
